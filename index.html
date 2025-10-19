@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nga Rauru - Pakaraka</title>
+    <title>Te Pae Virtual Tour</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
     <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <style>
@@ -24,55 +24,104 @@
             height: 100vh;
         }
         
+        .scene-selector {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .scene-btn {
+            padding: 12px 24px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .scene-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .scene-btn.active {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
         .title {
             position: absolute;
-            top: 30px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 100;
             color: white;
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 600;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px 40px;
-            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 30px;
+            border-radius: 10px;
             backdrop-filter: blur(10px);
-            text-align: center;
-        }
-        
-        .subtitle {
-            font-size: 16px;
-            font-weight: 400;
-            margin-top: 5px;
-            opacity: 0.9;
         }
         
         @media (max-width: 768px) {
-            .title {
-                font-size: 24px;
-                padding: 15px 25px;
-                top: 20px;
+            .scene-selector {
+                top: 10px;
+                padding: 10px 15px;
+                gap: 8px;
             }
             
-            .subtitle {
-                font-size: 14px;
+            .scene-btn {
+                padding: 10px 18px;
+                font-size: 12px;
+            }
+            
+            .title {
+                font-size: 18px;
+                bottom: 20px;
+                padding: 12px 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="title">
-        Pakaraka
-        <div class="subtitle">Nga Rauru Marae</div>
+    <div class="scene-selector">
+        <button class="scene-btn active" onclick="loadScene('auditorium')">Auditorium</button>
+        <button class="scene-btn" onclick="loadScene('rivers')">Rivers Room</button>
     </div>
+    
+    <div id="title" class="title">Auditorium</div>
     
     <div id="panorama"></div>
     
     <script>
-        pannellum.viewer('panorama', {
+        const scenes = {
+            auditorium: {
+                title: 'Auditorium',
+                image: 'Auditorium_360.jpg'
+            },
+            rivers: {
+                title: 'Rivers Room',
+                image: 'RiversRoom_360.jpg'
+            }
+        };
+        
+        let viewer = pannellum.viewer('panorama', {
             type: 'equirectangular',
-            panorama: 'pakaraka_360.jpg',
+            panorama: scenes.auditorium.image,
             autoLoad: true,
             autoRotate: -2,
             autoRotateInactivityDelay: 3000,
@@ -84,6 +133,22 @@
             pitch: 0,
             yaw: 0
         });
+        
+        function loadScene(sceneId) {
+            const scene = scenes[sceneId];
+            
+            // Update buttons
+            document.querySelectorAll('.scene-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update title
+            document.getElementById('title').textContent = scene.title;
+            
+            // Load new panorama
+            viewer.loadScene(scene.image, 0, 0, 100);
+        }
     </script>
 </body>
 </html>
